@@ -11,21 +11,28 @@
   
   <sync><length><cmd>
   
+  Liam Friel
+  CoderDojo Bray
+  
 */
 
 #define SYNCBYTE           0xFC
 
+// 64 bytes is enough for anyone
 #define MAXCOMMANDLENGTH   64
 
+// Simple states of our protocol handler
 #define WAITFORSYNC     1
 #define WAITFORLENGTH   2
 #define WAITFORDATA     3
 
+// State of our command reception
 boolean commandReceived = false; 
 int commandBuffer[MAXCOMMANDLENGTH];
 int commandBufferIndex = 0;
 int commandLength = 0;
 
+// Current state of the protocol handler
 int protocolState = WAITFORSYNC;
 
 unsigned long lastCommandTime = 0;
@@ -40,11 +47,12 @@ int uSensorTrig[] = {12,11};
 int uSensorEcho[] = {8,9};
 
 // LED pins
+#define NUMLEDS      3
 int ledPINs[] = {5,6,7};
 
 boolean ledOn = false;
 
-// sends a pulse to out of our HC-SR04 sensors and returns the raw distance
+// sends a pulse to one of our HC-SR04 sensors and returns the raw distance
 long readDistanceSensor(int uSensor)
 {
     long duration;
@@ -84,6 +92,8 @@ void executeCommandBuffer() {
               if( uSensor <= 1 ) {
                 distance = readDistanceSensor(uSensor);   
                 
+                // TODO: improve this to have a formatted command going back
+                // Should identify the sensor 
                 Serial.print(distance);
                 Serial.println();
               }
@@ -100,9 +110,7 @@ void executeCommandBuffer() {
               led = (int)commandBuffer[nextByte++];
               ledBrightness = (int)commandBuffer[nextByte++];
               
-              // Hardcoded: would be better to make this a #define 
-              // Or could also be a parameter
-              if( led <= 2 )
+              if( led < NUMLEDS )
               {
                 analogWrite(ledPINs[led], ledBrightness);
               }
@@ -120,6 +128,8 @@ void executeCommandBuffer() {
 
 void setup() {
   
+  int i;
+  
   // This serial data rate has to match the serial rate setup on the computer side
   Serial.begin(115200);
   
@@ -129,9 +139,9 @@ void setup() {
   pinMode(uSensorTrig[0], OUTPUT);
   pinMode(uSensorTrig[1], OUTPUT);
   
-  pinMode(ledPINs[0], OUTPUT);
-  pinMode(ledPINs[1], OUTPUT);
-  pinMode(ledPINs[2], OUTPUT);
+  for( i=0; i < NUMLEDS; i++ ) {
+    pinMode(ledPINs[i], OUTPUT);
+  }
 }
 
 // This is our processing loop
