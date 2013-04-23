@@ -6,7 +6,7 @@
  This is an extremely simple example, which just loops, computing the raw "duration", which is a function of distance,
  and prints this on the serial port - which you can view on the serial monitor.
 
- The code should be used an example and the basis for computing distance in centimeters after calibration
+ The code should be used an example and the basis for computing distance in centimetres after calibration
  
  This example code is in the public domain.
  
